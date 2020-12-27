@@ -21,7 +21,6 @@ import  LazyLoad, {forceCheck} from 'react-lazyload';
 import Scroll from './../../baseUI/Scroll';
 import {connect} from 'react-redux';
 import Loading from '../../baseUI/Loading';
-import {Content} from "../Recommend/style";
 
 function Singers(props) {
   // let [category, setCategory] = useState('');

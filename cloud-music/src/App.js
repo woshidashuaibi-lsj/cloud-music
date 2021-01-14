@@ -5,6 +5,7 @@ import {GlobalStyle} from './style';
 import {renderRoutes} from 'react-router-config';// renderRoutes 读取路由配置转化为 Route 标签
 import routes from './routes/index.js';
 import store from './store/index'
+import { Data } from './application/Singers/data';
 import {HashRouter} from 'react-router-dom';
 
 function App() {
@@ -13,7 +14,9 @@ function App() {
         <HashRouter>
             <GlobalStyle />
             <IconStyle/>
-            {renderRoutes(routes)}
+            <Data>
+                {renderRoutes(routes)}
+            </Data>
         </HashRouter>
         </Provider>
     );

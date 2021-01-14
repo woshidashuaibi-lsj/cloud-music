@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Horizen from '../../baseUI/horizenItem';
 import { categoryTypes, alphaTypes,type,area } from '../../api/config';
 import {
@@ -21,35 +21,45 @@ import  LazyLoad, {forceCheck} from 'react-lazyload';
 import Scroll from './../../baseUI/Scroll';
 import {connect} from 'react-redux';
 import Loading from '../../baseUI/Loading';
+import {CategoryDataContext, CHANGE_ALPHA, CHANGE_AREAS, CHANGE_TYPES} from "./data";
 
 function Singers(props) {
   // let [category, setCategory] = useState('');
-  let [alpha, setAlpha] = useState('');
-  const [types, setTypes] = useState('');
-  const [areas, setAreas] = useState('')
+  // let [alpha, setAlpha] = useState('');
+  // const [types, setTypes] = useState('');
+  // const [areas, setAreas] = useState('')
+
+  // 首先需要引入 useContext
+// 将之前的 useState 代码删除
+  const {data, dispatch} = useContext (CategoryDataContext);
+// 拿到 category 和 alpha 的值
+  const {types,areas,alpha} = data.toJS ();
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props;
 
   const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props;
 
   useEffect(() => {
-    getHotSingerDispatch();
-    // eslint-disable-next-line
+    if (!singerList.size) {
+      getHotSingerDispatch();
+      // eslint-disable-next-line
+    }
   }, []);
 
+  //CHANGE_ALPHA 和 CHANGE_CATEGORY 变量需要从 data.js 中引入
   let handleUpdateAlpha = (val) => {
-    setAlpha(val);
+    dispatch ({type: CHANGE_ALPHA, data: val});
     updateDispatch(types,areas, val);
   };
 
   let handleUpdateType = (val) => {
     console.log(val)
-    setTypes(val)
+    dispatch ({type: CHANGE_TYPES, data: val});
     updateDispatch(val, areas, alpha);
   }
   const handleUpdateArea = (val) => {
     console.log(val)
-    setAreas(val)
+    dispatch ({type: CHANGE_AREAS, data: val});
     updateDispatch(types,val,alpha);
   }
 

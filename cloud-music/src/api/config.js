@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const baseUrl = 'http://192.168.0.102:3000';
+export const baseUrl = 'http://localhost:3000';
 
 //axios 的实例及拦截器配置
 const axiosInstance = axios.create ({
@@ -225,6 +225,8 @@ export const alphaTypes = [{
         name: "Z"
     }
 ];
+
+export const HEADER_HEIGHT = 45;
 
 export {
     axiosInstance

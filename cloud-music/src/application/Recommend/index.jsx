@@ -6,6 +6,7 @@ import RecommendList from '../../components/list';
 import Scroll from '../../baseUI/Scroll';
 import { Content } from './style';
 import { forceCheck } from 'react-lazyload';
+import { renderRoutes } from 'react-router-config';
 import Loading from '../../baseUI/Loading';
 
 function Recommend (props){
@@ -37,6 +38,7 @@ function Recommend (props){
                 </div>
             </Scroll>
             { enterLoading ? <Loading/> : null }
+            { renderRoutes (props.route.routes) }
         </Content>
     );
 }

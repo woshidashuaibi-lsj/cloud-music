@@ -22,6 +22,7 @@ import Scroll from './../../baseUI/Scroll';
 import {connect} from 'react-redux';
 import Loading from '../../baseUI/Loading';
 import {CategoryDataContext, CHANGE_ALPHA, CHANGE_AREAS, CHANGE_TYPES} from "./data";
+import {renderRoutes} from "react-router-config";
 
 function Singers(props) {
   // let [category, setCategory] = useState('');
@@ -70,6 +71,9 @@ function Singers(props) {
   const handlePullDown = () => {
     pullDownRefreshDispatch(types,areas,alpha);
   };
+  const enterDetail = (id)  => {
+    props.history.push (`/singers/${id}`);
+  };
 
   const renderSingerList = () => {
     const list = singerList ? singerList.toJS(): [];
@@ -79,7 +83,7 @@ function Singers(props) {
         {
           list.map((item, index) => {
             return (
-              <ListItem key={item.accountId+""+index}>
+              <ListItem key={item.accountId+""+index} onClick={() => enterDetail(item.id)}>
                 <div className="img_wrapper">
                   <LazyLoad placeholder={<img width="100%" height="100%" src={require('./singer.png')} alt="music"/>}>
                     <img src={`${item.picUrl}?param=300x300`} width="100%" height="100%" alt="music"/>
@@ -97,9 +101,9 @@ function Singers(props) {
   return (
     <div>
       <NavContainer>
-        <Horizen list={type} title={"歌手类型: "} handleClick={val => handleUpdateType(val)} oldVal={types}></Horizen>
-        <Horizen list={area} title={"地区分类: "} handleClick={val => handleUpdateArea(val)} oldVal={areas}></Horizen>
-        <Horizen list={alphaTypes} title={"首字母: "} handleClick={val => handleUpdateAlpha(val)} oldVal={alpha}></Horizen>
+        <Horizen list={type} title={"歌手类型: "} handleClick={val => handleUpdateType(val)} oldVal={types}/>
+        <Horizen list={area} title={"地区分类: "} handleClick={val => handleUpdateArea(val)} oldVal={areas}/>
+        <Horizen list={alphaTypes} title={"首字母: "} handleClick={val => handleUpdateAlpha(val)} oldVal={alpha}/>
       </NavContainer>
       <ListContainer>
         <Scroll
@@ -113,6 +117,7 @@ function Singers(props) {
         </Scroll>
         { enterLoading ? <Loading/> : null }
       </ListContainer>
+      { renderRoutes (props.route.routes) }
     </div>
   )
 }

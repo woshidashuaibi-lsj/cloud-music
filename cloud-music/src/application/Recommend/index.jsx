@@ -27,7 +27,6 @@ function Recommend (props){
 
     const bannerListJS = bannerList ? bannerList.toJS () : [];
     const recommendListJS = recommendList ? recommendList.toJS () :[];
-  console.log(bannerListJS)
 
     return (
         <Content>

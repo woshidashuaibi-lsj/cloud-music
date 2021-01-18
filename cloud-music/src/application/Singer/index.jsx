@@ -8,11 +8,14 @@ import SongList from "../SongList";
 import {HEADER_HEIGHT} from "../../api/config";
 import { connect } from 'react-redux';
 import { getSingerInfo, changeEnterLoading } from "./store/actionCreators";
+import MusicNote from "../../baseUI/musicNote/index";
 import Loading from "../../baseUI/Loading";
 
 function Singer(props) {
     const initialHeight = useRef(0);
     const [showStatus, setShowStatus] = useState(true);
+    const musicNoteRef = useRef ();
+    const { songsCount } = props;
 
     const {
         artist: immutableArtist,
@@ -46,6 +49,10 @@ function Singer(props) {
         songScroll.current.refresh();
         // eslint-disable-next-line
     }, []);
+
+    const musicAnimation = (x, y) => {
+        musicNoteRef.current.startAnimation ({ x, y });
+    };
 
     const handleScroll = useCallback(pos => {
         let height = initialHeight.current;
@@ -98,29 +105,31 @@ function Singer(props) {
             unmountOnExit
             onExited={() => props.history.goBack()}
         >
-            <Container>
+            <Container play={songsCount}>
                 <Header
                     handleClick={setShowStatusFalse}
                     title={artist.name}
                     ref={header}
-                ></Header>
+                />
                 <ImgWrapper ref={imageWrapper} bgUrl={artist.picUrl}>
-                    <div className="filter"></div>
+                    <div className="filter"/>
                 </ImgWrapper>
                 <CollectButton ref={collectButton}>
                     <i className="iconfont">&#xe62d;</i>
                     <span className="text">收藏</span>
                 </CollectButton>
-                <BgLayer ref={layer}></BgLayer>
+                <BgLayer ref={layer} />
                 <SongListWrapper ref={songScrollWrapper}>
                     <Scroll ref={songScroll} onScroll={handleScroll}>
                         <SongList
                             songs={songs}
                             showCollect={false}
+                            musicAnimation={musicAnimation}
                         />
                     </Scroll>
                 </SongListWrapper>
                 { loading ? (<Loading/>) : null}
+                <MusicNote ref={musicNoteRef}/>
             </Container>
         </CSSTransition>
     )
@@ -131,6 +140,7 @@ const mapStateToProps = state => ({
     artist: state.getIn(["singerInfo", "artist"]),
     songs: state.getIn(["singerInfo", "songsOfArtist"]),
     loading: state.getIn(["singerInfo", "loading"]),
+    songsCount: state.getIn (['player', 'playList']).size,// 尽量减少 toJS 操作，直接取 size 属性就代表了 list 的长度
 });
 // 映射dispatch到props上
 const mapDispatchToProps = dispatch => {

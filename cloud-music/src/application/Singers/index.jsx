@@ -1,6 +1,6 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useEffect, useContext} from 'react';
 import Horizen from '../../baseUI/horizenItem';
-import { categoryTypes, alphaTypes,type,area } from '../../api/config';
+import { alphaTypes,type,area } from '../../api/config';
 import {
   NavContainer,
   ListContainer,
@@ -35,6 +35,8 @@ function Singers(props) {
   const {data, dispatch} = useContext (CategoryDataContext);
 // 拿到 category 和 alpha 的值
   const {types,areas,alpha} = data.toJS ();
+
+  const { songsCount } = props;
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props;
 
@@ -105,7 +107,7 @@ function Singers(props) {
         <Horizen list={area} title={"地区分类: "} handleClick={val => handleUpdateArea(val)} oldVal={areas}/>
         <Horizen list={alphaTypes} title={"首字母: "} handleClick={val => handleUpdateAlpha(val)} oldVal={alpha}/>
       </NavContainer>
-      <ListContainer>
+      <ListContainer play={songsCount}>
         <Scroll
           pullUp={ handlePullUp }
           pullDown = { handlePullDown }
@@ -127,7 +129,8 @@ const mapStateToProps = (state) => ({
   enterLoading: state.getIn(['singers', 'enterLoading']),
   pullUpLoading: state.getIn(['singers', 'pullUpLoading']),
   pullDownLoading: state.getIn(['singers', 'pullDownLoading']),
-  pageCount: state.getIn(['singers', 'pageCount'])
+  pageCount: state.getIn(['singers', 'pageCount']),
+  songsCount: state.getIn (['player', 'playList']).size,
 });
 const mapDispatchToProps = (dispatch) => {
   return {

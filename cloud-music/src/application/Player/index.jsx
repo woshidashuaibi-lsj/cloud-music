@@ -15,6 +15,8 @@ import {
 import {findIndex, getSongUrl, isEmptyObject, shuffle} from "../../api/utils";
 import {playMode} from "../../api/config";
 import PlayList from "./PlayList";
+import {getLyricRequest} from "../../api/request";
+import Lyric from "../../api/lyricParser";
 
 function Player(props) {
     //目前播放时间
@@ -25,6 +27,7 @@ function Player(props) {
     const [modeText, setModeText] = useState("");
 
     const toastRef = useRef();
+    const currentLyric = useRef ();
 
 //歌曲播放进度
     let percent = isNaN(currentTime / duration) ? 0 : currentTime / duration;
@@ -32,7 +35,11 @@ function Player(props) {
     //记录当前的歌曲，以便于下次重渲染时比对是否是一首歌
     const [preSong, setPreSong] = useState({});
 
+    const [currentPlayingLyric, setPlayingLyric] = useState ("");
+
     const audioRef = useRef();
+
+    const currentLineNum = useRef (0);
 
     // const {fullScreen, playing, currentIndex, currentSong: immutableCurrentSong} = props;
     // const {toggleFullScreenDispatch, togglePlayingDispatch, changeCurrentIndexDispatch, changeCurrentDispatch} = props;
@@ -72,6 +79,9 @@ function Player(props) {
         audioRef.current.currentTime = newTime;
         if (!playing) {
             togglePlayingDispatch(true);
+        }
+        if (currentLyric.current) {
+            currentLyric.current.seek (newTime * 1000);
         }
     };
 
@@ -129,6 +139,36 @@ function Player(props) {
         changeCurrentIndexDispatch(index);
     };
 
+    const handleLyric = ({lineNum, txt}) => {
+        if (!currentLyric.current) return;
+        currentLineNum.current = lineNum;
+        setPlayingLyric (txt);
+    };
+
+    const getLyric = id => {
+        let lyric = "";
+        if (currentLyric.current) {
+            currentLyric.current.stop ();
+        }
+        // 避免 songReady 恒为 false 的情况
+        getLyricRequest (id)
+            .then (data => {
+                lyric = data.lrc.lyric;
+                if (!lyric) {
+                    currentLyric.current = null;
+                    return;
+                }
+                currentLyric.current = new Lyric(lyric, handleLyric);
+                currentLyric.current.play ();
+                currentLineNum.current = 0;
+                currentLyric.current.seek (0);
+            })
+            .catch (() => {
+                songReady.current = true;
+                audioRef.current.play ();
+            });
+    };
+
     useEffect (() => {
         changeCurrentIndexDispatch (0);
     }, [])
@@ -159,13 +199,18 @@ function Player(props) {
             });
         });
         togglePlayingDispatch (true);// 播放状态
+        getLyric (current.id);
         setCurrentTime (0);// 从头开始播放
         setDuration ((current.dt/ 1000) | 0);// 时长
+
     }, [playList, currentIndex]);
 
     const clickPlaying = (e, state) => {
         e.stopPropagation();
         togglePlayingDispatch(state);
+        if (currentLyric.current) {
+            currentLyric.current.togglePlay(currentTime*1000);
+        }
     };
 
     const updateTime = e => {
@@ -214,6 +259,9 @@ function Player(props) {
                     mode={mode}
                     changeMode={changeMode}
                     togglePlayList={togglePlayListDispatch}
+                    currentLyric={currentLyric.current}
+                    currentPlayingLyric={currentPlayingLyric}
+                    currentLineNum={currentLineNum.current}
                 />
             }
             <audio

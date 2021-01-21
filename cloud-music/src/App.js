@@ -7,6 +7,7 @@ import routes from './routes/index.js';
 import store from './store/index'
 import { Data } from './application/Singers/data';
 import {HashRouter} from 'react-router-dom';
+import "./fix.css";
 
 function App() {
     return (
